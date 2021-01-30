@@ -1,6 +1,16 @@
 version: 2.0
 
 jobs:
+  verify:
+    docker:
+      - image: circleci/openjdk:stretch
+        auth:
+          username: mydockerhub-user
+          password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
+    steps:
+      - checkout
+      - run: ./mvnw verify
+
   build:
     docker:
       - image: circleci/openjdk:stretch
@@ -9,23 +19,14 @@ jobs:
           password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
     steps:
       - checkout
-      - command: -mvn clean compile
-      
-  test:
-    docker:
-      - image: circleci/openjdk:stretch
-        auth:
-          username: mydockerhub-user
-          password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
-    steps:
-      - checkout
-      - run: -mvn verify
-      - store_artifacts:
-          path: target/site/serenity/index.html
+      - run: ./mvnw -Dmaven.test.skip=true package
 
 workflows:
   version: 2
 
-  test-with-store-artifacts:
+  build-then-test:
     jobs:
-      - test
+      - build
+      - verify:
+          requires:
+            - build

@@ -1,0 +1,21 @@
+version: 2.0
+
+jobs:
+  build:
+    steps:
+      - checkout
+      - run: ./mvnw clean compile
+      
+  test:
+    steps:
+      - checkout
+      - run: ./mvnw test verify
+      - store_artifacts:
+          path: target/site/serenity/index.html
+
+workflows:
+  version: 2
+
+  test-with-store-artifacts:
+    jobs:
+      - test

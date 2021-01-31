@@ -10,6 +10,8 @@ jobs:
     steps:
       - checkout
       - run: mvn test
+      - store_artifacts:
+          path: target/site/serenity
 
   build:
     docker:
